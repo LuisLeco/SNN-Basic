@@ -17,7 +17,7 @@ class Trainer:
             data = encoder.encode(data).to(self.device)
             targets = targets.to(self.device)
 
-            spk_rec, mem_rec = self.net(data.view(num_steps, data.size(0), -1), num_steps)
+            spk_rec, mem_rec = self.net(data.view(num_steps, data.size(1), -1), num_steps)
 
             loss_val = torch.zeros((1), dtype=torch.float, device=self.device)
             for step in range(num_steps):
@@ -39,7 +39,7 @@ class Trainer:
                 data = encoder.encode(data).to(self.device)
                 targets = targets.to(self.device)
 
-                spk_rec, _ = self.net(data.view(num_steps, data.size(0), -1), num_steps)
+                spk_rec, _ = self.net(data.view(num_steps, data.size(1), -1), num_steps)
                 decoded = decoder.decode(spk_rec)
 
                 _, predicted = decoded.max(1)
