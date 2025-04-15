@@ -231,12 +231,3 @@ with torch.no_grad():
 print("Rate coding:")
 print(f"Rate validation:\nTotal correctly classified test set images with rate validation: {correct}/{total}")
 print(f"Test Set Accuracy with rate validation: {100 * correct / total:.2f}%")
-
-plt.figure(figsize=(10, 5))
-plt.plot(loss_hist, label='Training Loss')
-plt.plot(test_loss_hist, label='Test Loss')
-plt.xlabel('Iteration')
-plt.ylabel('Loss')
-plt.title('Training and Test Loss Over Time')
-plt.legend()
-plt.show()
