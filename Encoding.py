@@ -1,5 +1,5 @@
 import snntorch.spikegen as spikegen
-
+import torch
 
 class Encoder:
     def __init__(self, num_steps):
@@ -34,3 +34,12 @@ class DirectEncoder(Encoder):
         
     def encode(self, data):
         return data.unsqueeze(0).repeat(self.num_steps, 1, 1, 1, 1) # -> torch.Size([num_steps, 128, 1, 28, 28])
+    
+class PoissonGen(Encoder):  #Rate vs Direct paper
+    def __init__(self, num_steps):
+        super().__init__(num_steps)
+        
+    def encode(self, data):
+        rand_data = torch.rand_like(data)
+        output = torch.mul(torch.le(rand_data * 2.0, torch.abs(data)).float(), torch.sign(data))
+        return output.unsqueeze(0).repeat(self.num_steps, 1, 1, 1, 1)
