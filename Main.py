@@ -1,5 +1,6 @@
 import torch
 from Experiment import SNNExperiment
+import time
 
 config = {
     'dataset': 'MNIST',
@@ -24,9 +25,12 @@ config = {
 }
 
 if __name__ == "__main__":
+    start_time = time.time()
     experiment = SNNExperiment(config)
     final_accuracy = experiment.run()
     print(f"\n✅ Final test accuracy: {final_accuracy:.2f}%")
-    print("\nDebug del decoder:")
-    print("Tipo:", config['decoder'])
-    print("Salida ejemplo:", experiment.decoder.decode(torch.rand(25, 1, 10)))
+    #print("\nDebug del decoder:")
+    #print("Tipo:", config['decoder'])
+    #print("Salida ejemplo:", experiment.decoder.decode(torch.rand(25, 1, 10)))
+    end_time = time.time()
+    print(f"Tiempo de ejecución: {end_time - start_time:.4f} segundos")

@@ -1,6 +1,6 @@
 import torch
 from Datasets import MNISTDataset
-from Encoding import RateEncoder, TtfsEncoder, DirectEncoder, PoissonGen
+from Encoding import RateEncoder, TtfsEncoder, DirectEncoder, PoissonGen, Ttfs_time_Encoder
 from Decoding import RateDecoder
 from Architecture import TwoLayerSNN
 from Trainer import Trainer
@@ -31,6 +31,8 @@ class SNNExperiment:
             return PoissonGen(self.config['num_steps'])
         elif self.config['encoder'] == "ttfs":
             return TtfsEncoder(self.config['num_steps'])
+        elif self.config['encoder'] == "ttfs_time":
+            return Ttfs_time_Encoder(self.config['num_steps'])
         elif self.config['encoder'] == "direct":
             return DirectEncoder(self.config['num_steps'])
 
