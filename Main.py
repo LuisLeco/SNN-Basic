@@ -5,7 +5,7 @@ import time
 config = {
     'dataset': 'MNIST',
     'encoder': 'rate', # posibles: poisson, rate, ttfs, direct, ttfs_time, delta
-    'decoder': 'rate',
+    'decoder': 'first_spike', # posibles: , rate, latency, first_spike
     'architecture': 'TwoLayerSNN',
     'data_path': './data/mnist',
     'batch_size': 128,
@@ -28,8 +28,8 @@ if __name__ == "__main__":
     start_time = time.time()
     experiment = SNNExperiment(config)
     final_accuracy = experiment.run()
-    print(f"\n✅ Final test accuracy: {final_accuracy:.2f}%")
-    #print("\nDebug del decoder:")
+    print(f"\n Final test accuracy: {final_accuracy:.2f}%")
+    #print("\nDebug del decoder:") # Testeo Decodificador
     #print("Tipo:", config['decoder'])
     #print("Salida ejemplo:", experiment.decoder.decode(torch.rand(25, 1, 10)))
     end_time = time.time()
