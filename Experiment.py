@@ -1,6 +1,6 @@
 import torch
 from Datasets import MNISTDataset
-from Encoding import RateEncoder, TtfsEncoder, DirectEncoder, PoissonGen, Ttfs_time_Encoder, DeltaEncoder
+from Encoding import RateEncoder, TtfsEncoder, DirectEncoder, PoissonGen, Ttfs_time_Encoder, DeltaEncoder, MWEncoder
 from Decoding import RateDecoder, FirstSpikeDecoder, LatencyDecoder
 from Architecture import TwoLayerSNN
 from Trainer import Trainer
@@ -33,6 +33,10 @@ class SNNExperiment:
            return TtfsEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "direct":
            return DirectEncoder(self.config['num_steps'])
+       elif self.config['encoder'] == "delta":
+            return DeltaEncoder(self.config['num_steps'], off_spike=False)
+       elif self.config['encoder'] == "MW":
+            return MWEncoder(self.config['num_steps'])
        else:
            raise ValueError(f"Coder no soportado")
 
@@ -66,7 +70,7 @@ class SNNExperiment:
            if (epoch + 1) % self.config['eval_freq'] == 0:
                accuracy = self.trainer.evaluate(test_loader)
 
-       print(
-           f"\ndataset: {self.config['dataset']}. Encoder: {self.config['encoder']}. Architecture: {self.config['architecture']}. Decoder: {self.config['decoder']}")
+       print(f"\ndataset: {self.config['dataset']}. Encoder: {self.config['encoder']}. Architecture: {self.config['architecture']}. Decoder: {self.config['decoder']}")
+       print(f"num_steps: {self.config['num_steps']}. Batch_size: {self.config['batch_size']}. Epochs: {self.config['num_epochs']}.")
        return accuracy
 

@@ -4,8 +4,8 @@ import time
 
 config = {
     'dataset': 'MNIST',
-    'encoder': 'rate', # posibles: poisson, rate, ttfs, direct, ttfs_time, delta
-    'decoder': 'first_spike', # posibles: , rate, latency, first_spike
+    'encoder': 'MW', # posibles: poisson, rate, ttfs, direct, ttfs_time, delta, MW
+    'decoder': 'rate', # posibles: , rate, latency, first_spike
     'architecture': 'TwoLayerSNN',
     'data_path': './data/mnist',
     'batch_size': 128,

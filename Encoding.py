@@ -82,3 +82,75 @@ class DeltaEncoder(Encoder):
         #Duplica la solucion x los num_steps
         final = solution.unsqueeze(0).repeat(self.num_steps, 1, 1, 1, 1) # -> torch.Size([num_steps, 128, 1, 28, 28])
         return final
+
+
+class MWEncoder(Encoder): # Moving window
+    # Spiking Neural Networks: Background, Recent Development and the NeuCube Architecture. https://github.com/KEDRI-AUT/snn-encoder-tools
+    def __init__(self, num_steps, threshold=0.1, window = 5):
+        super().__init__(num_steps)
+        self.threshold = threshold
+        self.window = window
+
+
+    import torch
+
+    def encode(self, data) -> torch.Tensor:
+        """
+        Versión optimizada de Moving Window encoding para batches de imágenes MNIST.
+        
+        Args:
+            data: Tensor de entrada con shape (batch_size, 1, 28, 28)
+            threshold: Umbral para determinar picos
+            window: Tamaño de la ventana (muestras anteriores a considerar)
+        
+        Returns:
+            Tensor codificado con valores -1, 0, 1 y mismo shape que la entrada.
+        """
+        batch_size, channels, height, width = data.shape
+        data_flat = data.view(batch_size, -1)  # (batch_size, 784)
+        seq_len = data_flat.size(1) # 784
+        device = data.device
+        
+        # 1. Cálculo de sumas acumuladas con padding
+        padded_cumsum = torch.cat([
+            torch.zeros((batch_size, 1), device=device),
+            torch.cumsum(data_flat, dim=1)
+        ], dim=1)  # (batch_size, seq_len + 1)
+        
+        # 2. Índices y cálculos vectorizados
+        t_indices = torch.arange(seq_len, device=device)  # (seq_len,)
+        start_indices = t_indices - self.window - 1
+        valid_start = torch.clamp(start_indices, min=0)  # (seq_len,)
+        
+        # 3. Obtener valores del padded_cumsum usando gather
+        sum_window_start = torch.gather(
+            padded_cumsum, 
+            1, 
+            valid_start.unsqueeze(0).expand(batch_size, -1).long()
+        )
+        
+        sum_window_end = padded_cumsum[:, 1:seq_len+1]  # (batch_size, seq_len)
+        sum_window_all = sum_window_end - sum_window_start
+        
+        # 4. Calcular sum_initial y máscaras
+        sum_initial = padded_cumsum[:, self.window + 1] - padded_cumsum[:, 0]
+        mask_initial = t_indices <= self.window
+        
+        # 5. Combinar sumas iniciales y móviles
+        sum_total = torch.where(
+            mask_initial.unsqueeze(0),
+            sum_initial.unsqueeze(1).expand(-1, seq_len),
+            sum_window_all
+        )
+        
+        # 6. Calcular medias y aplicar umbral
+        mean = sum_total / (self.window + 1)
+        upper = data_flat > (mean + self.threshold)
+        lower = data_flat < (mean - self.threshold)
+        
+        # 7. Generar salida codificada
+        out = torch.zeros_like(data_flat, dtype=torch.float)
+        out[upper] = 1
+        out[lower] = -1
+        
+        return out.view(batch_size, channels, height, width).unsqueeze(0).repeat(self.num_steps, 1, 1, 1, 1)
