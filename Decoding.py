@@ -53,3 +53,33 @@ class FirstSpikeDecoder(Decoder):
            spike_times.argmin(dim=-1),
            num_classes=spk_rec.shape[-1]
        ).float()
+
+
+class PopulationRateDecoder(Decoder):
+    def __init__(self, num_steps, num_classes=10, num_neurons_per_class=5):
+        super().__init__(num_steps)
+        self.num_classes = num_classes
+        self.num_neurons_per_class = num_neurons_per_class
+
+    def decode(self, spk_rec):
+        population_activity = spk_rec.sum(dim=0)
+        total_neurons = self.num_classes * self.num_neurons_per_class
+        if population_activity.size(1) != total_neurons:
+            raise ValueError(f"Expected {total_neurons} output neurons, got {population_activity.size(1)}")
+        class_activity = population_activity.view(
+            -1, self.num_classes, self.num_neurons_per_class
+        ).sum(dim=2)
+        return class_activity
+
+class RankOrderDecoder(Decoder):
+    def __init__(self, num_steps, num_classes):
+        super().__init__(num_steps)
+        self.num_classes = num_classes
+
+
+    def decode(self, spk_rec):
+        spike_times = (spk_rec > 0).float().argmax(dim=0)
+        spike_times[(spk_rec > 0).float().sum(dim=0) == 0] = self.num_steps
+        ranks = spike_times.argsort(dim=-1).argsort(dim=-1).float()
+        scores = (self.num_classes - ranks) / self.num_classes
+        return scores
