@@ -51,6 +51,10 @@ class SNNExperiment:
            return LatencyDecoder(self.config['num_steps'], **params)
        elif decoder_type == "first_spike":
            return FirstSpikeDecoder(self.config['num_steps'], **params)
+       elif decoder_type == "population":
+           return PopulationRateDecoder(self.config['num_steps'], **params)
+       elif decoder_type == "rank_order":
+           return RankOrderDecoder(self.config['num_steps'], **params)
        else:
            raise ValueError(f"Decoder no soportado: {decoder_type}")
 
