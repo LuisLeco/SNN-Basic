@@ -6,7 +6,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 import torch
 from Encoding import Encoder
-from Decoding import Decoder
+from Decoding import Decoder, AllDecoders
 import torch.nn as nn
 
 class Trainer:
@@ -39,8 +39,8 @@ class Trainer:
     def evaluate(self, test_loader):
         self.net.eval()
         total = 0
-        correct = 0
-
+        correct = [0,0,0,0,0]
+        accuracy = {}
         with torch.no_grad():
             for data, targets in test_loader:
                 data = self.encoder.encode(data).to(self.device)
@@ -48,11 +48,12 @@ class Trainer:
 
                 spk_rec, _ = self.net(data.view(self.num_steps, data.size(1), -1), self.num_steps)
                 decoded = self.decoder.decode(spk_rec)
-
-                _, predicted = decoded.max(1)
+                
                 total += targets.size(0)
-                correct += (predicted == targets).sum().item()
-
-        accuracy = 100 * correct / total
-        #print(f"Test Set Accuracy: {accuracy:.2f}%")
+                for i in range(len(decoded)):
+                    _, predicted = decoded[i].max(1)
+                    correct[i] += (predicted == targets).sum().item()
+        for i in range(len(decoded)):
+            accuracy[i] = 100 * correct[i] / total
+            #print(f"Test Set Accuracy: {accuracy:.2f}%")
         return accuracy

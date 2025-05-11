@@ -7,7 +7,7 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 import torch
 from Datasets import MNISTDataset
 from Encoding import RateEncoder, TtfsEncoder, DirectEncoder, PoissonGen, Ttfs_time_Encoder, DeltaEncoder, MWEncoder, SFEncoder
-from Decoding import RateDecoder, FirstSpikeDecoder, LatencyDecoder, PopulationRateDecoder, RankOrderDecoder
+from Decoding import RateDecoder, FirstSpikeDecoder, LatencyDecoder, PopulationRateDecoder, RankOrderDecoder, AllDecoders
 from Architecture import TwoLayerSNN
 from Trainer import Trainer
 import torch.nn as nn
@@ -62,6 +62,8 @@ class SNNExperiment:
            return PopulationRateDecoder(self.config['num_steps'], **params)
        elif decoder_type == "rank_order":
            return RankOrderDecoder(self.config['num_steps'], **params)
+       elif decoder_type == "all":
+           return AllDecoders(self.config['num_steps'], **params)
        else:
            raise ValueError(f"Decoder no soportado: {decoder_type}")
 

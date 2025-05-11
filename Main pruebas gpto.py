@@ -3,14 +3,15 @@ import csv
 import copy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from Experiment import SNNExperiment
+from Decoding import AllDecoders
 
 num_steps = [10, 25, 50, 100, 200]
-decoders = ['rate']
+decoders = ['all']
 
 # Config base (fuera del proceso paralelo para seguridad)
 config_base = {
     'dataset': 'MNIST',
-    'encoder': 'ttfs_time',
+    'encoder': 'ttfs',
     'decoder': '',
     'architecture': 'TwoLayerSNN',
     'data_path': './data/mnist',
@@ -23,7 +24,7 @@ config_base = {
     'lr': 5e-4,
     'betas': (0.9, 0.999),
     'num_epochs': 32,
-    'eval_freq': 1,
+    'eval_freq': 32,
     'decoder_params': {
         'rate': {'scale': 1.0},
         'latency': {'target_time': 0.5, 'sensitivity': 1.0},
@@ -39,15 +40,21 @@ def run_experiment(decoder, num_step, trial, base_config):
     config['num_steps'] = num_step
     experiment = SNNExperiment(config)
     accuracy = experiment.run()
-    print(f"decoder={decoder}, num_steps={num_step}, trial={trial} → Final accuracy: {accuracy:.2f}%")
-    return {
-        'encoder': config['encoder'],
-        'decoder': decoder,
-        'num_steps': num_step,
-        'accuracy': f"{accuracy:.2f}",
-        'numero de prueba': trial
-    }
+    output = {}
+    for i in range(len(accuracy)):
+        decoder_i = AllDecoders.get_nombre(i)
+        accuracy_i = accuracy[i]
+        print(f"decoder={decoder_i}, num_steps={num_step}, trial={trial} → Final accuracy: {accuracy_i:.2f}%")
+        output[i] = {
+            'encoder': config['encoder'],
+            'decoder': decoder_i,
+            'num_steps': num_step,
+            'accuracy': f"{accuracy_i:.2f}",
+            'numero de prueba': trial
+        }
+    return output
 
+    
 if __name__ == "__main__":
     start_time = time.time()
     all_futures = []
@@ -66,7 +73,8 @@ if __name__ == "__main__":
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:
-            writer.writerow(row)
+            for i in row:
+                writer.writerow(row[i])
 
         total_time = time.time() - start_time
         csvfile.write(f"# Tiempo total de ejecucion: {total_time:.4f} segundos\n")

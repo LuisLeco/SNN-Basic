@@ -84,3 +84,33 @@ class RankOrderDecoder(Decoder):
         ranks = spike_times.argsort(dim=-1).argsort(dim=-1).float()
         scores = (self.num_classes - ranks) / self.num_classes
         return scores
+
+class AllDecoders(Decoder):
+    def __init__(self, num_steps, **kwargs):
+        super().__init__(num_steps, **kwargs)
+        self.rate = RateDecoder(num_steps)
+        self.latency = LatencyDecoder(num_steps)
+        self.firstSpike = FirstSpikeDecoder(num_steps)
+        self.populationRate = PopulationRateDecoder(num_steps, 10, 1)
+        self.rankOrder = RankOrderDecoder(num_steps, 10)
+    
+    def decode(self, spk_rec):
+        outputs = []
+        outputs.append(self.rate.decode(spk_rec))
+        outputs.append(self.latency.decode(spk_rec))
+        outputs.append(self.firstSpike.decode(spk_rec))
+        outputs.append(self.populationRate.decode(spk_rec))
+        outputs.append(self.rankOrder.decode(spk_rec))
+        return outputs
+    
+    def get_nombre(i):
+        if i == 0:
+            return "rate"
+        if i == 1:
+            return "latency"
+        if i == 2:
+            return "firstSpike"
+        if i == 3:
+            return "populationRate"
+        if i == 4:
+            return "rankOrder"
