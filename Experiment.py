@@ -52,6 +52,8 @@ class SNNExperiment:
             return MWEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "SF":
             return SFEncoder(self.config['num_steps'])
+       elif self.config['encoder'] == "Deterministic":
+           return DeterministicRateEncoder(self.config['num_steps'])
        else:
            raise ValueError(f"Coder no soportado")
 

@@ -16,7 +16,7 @@ decoders = ['all'] # posibles: rate, latency, first_spike, population,rank_order
 # Configuración base para los experimentos
 config_base = {
     'dataset': 'MNIST',
-    'encoder': 'ttfs',  # posibles: poisson, rate, ttfs, direct, delta, MW, SF
+    'encoder': 'ttfs',  # posibles: poisson, rate, ttfs, direct, delta, MW, SF, Deterministic
     'decoder': '',
     'architecture': 'TwoLayerSNN',
     'data_path': './data/mnist',
