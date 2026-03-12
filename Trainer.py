@@ -33,11 +33,11 @@ class Trainer:
 
         for data, targets in train_loader:
             # Codifica los datos de entrada
-            data = self.encoder.encode(data).to(self.device)
+            encodedData = self.encoder.encode(data).to(self.device)
             targets = targets.to(self.device)
 
             # Ejecuta la red SNN y obtiene los spikes y memorias
-            spk_rec, mem_rec = self.net(data.view(self.num_steps, data.size(1), -1), self.num_steps)
+            spk_rec, mem_rec = self.net(encodedData.view(self.num_steps, encodedData.size(1), -1), self.num_steps)
 
             # Calcula la pérdida acumulada sobre todos los pasos temporales
             loss_val = torch.zeros((1), dtype=torch.float, device=self.device)
@@ -62,10 +62,10 @@ class Trainer:
         
         with torch.no_grad():
             for data, targets in test_loader:
-                data = self.encoder.encode(data).to(self.device)
+                encodedData = self.encoder.encode(data).to(self.device)
                 targets = targets.to(self.device)
 
-                spk_rec, _ = self.net(data.view(self.num_steps, data.size(1), -1), self.num_steps)
+                spk_rec, _ = self.net(encodedData.view(self.num_steps, encodedData.size(1), -1), self.num_steps)
                 decoded = self.decoder.decode(spk_rec)
                 
                 total += targets.size(0)

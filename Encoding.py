@@ -27,16 +27,14 @@ class Encoder:
 class RateEncoder(Encoder):
     """
     Codifica los datos siguiendo una distribución de Bernoulli. Funciona igual que el PoissonEncoder.
-   
+
     Args:
         gain: Escala la probabilidad de generacion de spikes
     """
-    def __init__(self, num_steps, gain = 0.5):
+    def __init__(self, num_steps, gain = 0.8):
         super().__init__(num_steps)
-        self.gain = gain # reduce la frecuencia de spikes en ese gain %.
-        #Si un valor es 1 y el gain es 0.5 en vez de un 100% de spike tiene un 50%.
-        #print(self.gain)
-       
+        self.gain = gain 
+    
     def encode(self, data):
         return spikegen.rate(data, num_steps=self.num_steps, gain=self.gain)
 
@@ -46,15 +44,18 @@ class RateEncoder(Encoder):
 class TtfsEncoder(Encoder):
     """
     Codifica la data en el tiempo segun la intensidad del pixel.
-   
+    
     Args:
-        rescale_fac: es como el gain pero inverso. Gain = 0.5 -> rescale = 2.0
+        - normalize: True, el tiempo de disparo se normaliza para que el pixel más intenso dispare en el 
+            primer paso temporal y el menos intenso en el último. False, el tiempo de disparo se calcula 
+            directamente a partir de la intensidad sin normalización.
+        - linear: True, la relación entre intensidad y tiempo de disparo es lineal. False, es exponencial.
     """
-    def __init__(self, num_steps, normalize=True, linear=False):
+    def __init__(self, num_steps, normalize=True, linear=True):
         super().__init__(num_steps)
         self.normalize = normalize # Distribuye los spikes en los num_steps
         self.linear = linear # Algoritmo lineal o exponencial para distribuir los spikes en el tiempo
-       
+        
     def encode(self, data):
         return spikegen.latency(data, num_steps=self.num_steps, clip = True, normalize=self.normalize, linear=self.linear)
    
@@ -234,7 +235,7 @@ class SFEncoder(Encoder):
     """
    
     # Spiking Neural Networks: Background, Recent Development and the NeuCube Architecture. https://github.com/KEDRI-AUT/snn-encoder-tools
-    def __init__(self, num_steps = 25, threshold=0.1, off_spike=False):
+    def __init__(self, num_steps = 25, threshold=0.2, off_spike=False):
         super().__init__(num_steps)
         self.threshold = threshold
         self.off_spike = off_spike
@@ -268,7 +269,7 @@ class SFEncoder(Encoder):
             else:
                 # Solo permite 1.0 (Ignora bajadas en la salida)
                 outputs[:, :, :, w] = torch.where(up, 1.0, 0.0)
-           
+
             # 3. Actualizar Base (Step)
             # NOTA: La base SIEMPRE se actualiza, incluso si off_spike=False.
             # Si no bajamos la base cuando la señal cae, no podremos detectar la próxima subida.

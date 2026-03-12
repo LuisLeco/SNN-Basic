@@ -39,7 +39,7 @@ class SNNExperiment:
 
    def init_encoder(self):
        if self.config['encoder'] == "rate":
-           return RateEncoder(self.config['num_steps'], self.config.get('gain', 0.5))
+           return RateEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "poisson":
            return PoissonGen(self.config['num_steps'])
        elif self.config['encoder'] == "ttfs":
@@ -47,11 +47,11 @@ class SNNExperiment:
        elif self.config['encoder'] == "direct":
            return DirectEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "delta":
-            return DeltaEncoder(self.config['num_steps'], off_spike=False)
+           return DeltaEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "MW":
-            return MWEncoder(self.config['num_steps'])
+           return MWEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "SF":
-            return SFEncoder(self.config['num_steps'])
+           return SFEncoder(self.config['num_steps'])
        elif self.config['encoder'] == "Deterministic":
            return DeterministicRateEncoder(self.config['num_steps'])
        else:
