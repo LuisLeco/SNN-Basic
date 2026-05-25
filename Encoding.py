@@ -31,7 +31,7 @@ class RateEncoder(Encoder):
     Args:
         gain: Escala la probabilidad de generacion de spikes
     """
-    def __init__(self, num_steps, gain = 0.8):
+    def __init__(self, num_steps, gain = 0.5):
         super().__init__(num_steps)
         self.gain = gain 
     
@@ -235,7 +235,7 @@ class SFEncoder(Encoder):
     """
    
     # Spiking Neural Networks: Background, Recent Development and the NeuCube Architecture. https://github.com/KEDRI-AUT/snn-encoder-tools
-    def __init__(self, num_steps = 25, threshold=0.2, off_spike=False):
+    def __init__(self, num_steps, threshold=0.1, off_spike=False):
         super().__init__(num_steps)
         self.threshold = threshold
         self.off_spike = off_spike
