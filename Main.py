@@ -28,8 +28,8 @@ config_base = {
     'beta': 0.95,
     'lr': 5e-4,
     'betas': (0.9, 0.999),
-    'num_epochs': 1,
-    'eval_freq': 1,
+    'num_epochs': 32,
+    'eval_freq': 32,
     'decoder_params': {
         'rate': {'scale': 1.0},
         'latency': {'target_time': 0.5, 'sensitivity': 1.0},
