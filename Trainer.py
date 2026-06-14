@@ -59,6 +59,7 @@ class Trainer:
         total = 0
         correct = [0,0,0,0,0]  # Un contador para cada tipo de decoder
         accuracy = {}
+        spikes_totales = 0
         
         with torch.no_grad():
             for data, targets in test_loader:
@@ -66,6 +67,7 @@ class Trainer:
                 targets = targets.to(self.device)
 
                 spk_rec, _ = self.net(encodedData.view(self.num_steps, encodedData.size(1), -1), self.num_steps)
+                spikes_totales += spk_rec.sum().item()
                 decoded = self.decoder.decode(spk_rec)
                 
                 total += targets.size(0)
@@ -78,6 +80,11 @@ class Trainer:
                     for i in range(len(decoded)):
                         _, predicted = decoded[i].max(1)
                         correct[i] += (predicted == targets).sum().item()
+            
+        print("\tResumen spikes generados durante la evaluación para el codificador: ", self.encoder.__class__.__name__)    
+        print(f"\t\tTotal spikes generated during evaluation: {spikes_totales}")
+        print(f"\t\tMedia spikes por imagen: {spikes_totales / total}")
+        print(f"\t\tNúmero de spikes por batch: {spikes_totales / 128}")  # Asumiendo un tamaño de batch de 128
                         
         # Si solo hay un decoder, devolvemos su precisión
         if not isinstance(decoded, list):
