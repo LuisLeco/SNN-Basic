@@ -138,7 +138,7 @@ class DeltaEncoder(Encoder):
     Args:
         off_spike (bool): Generar spikes negativos
     """
-    def __init__(self, num_steps, off_spike=False, threshold=0.1): # No se utiliza el num_steps
+    def __init__(self, num_steps, off_spike=False, threshold=0.1):
         super().__init__(num_steps)
         self.off_spike = off_spike
         self.threshold = threshold
@@ -180,7 +180,7 @@ class MWEncoder(Encoder): # Moving window
         window (int): tamaño de la ventana
     """
     # Spiking Neural Networks: Background, Recent Development and the NeuCube Architecture. https://github.com/KEDRI-AUT/snn-encoder-tools
-    def __init__(self, num_steps, threshold=0.1, window = 5, off_spike=False):
+    def __init__(self, num_steps, threshold=0.2, window = 5, off_spike=False):
         super().__init__(num_steps)
         self.threshold = threshold
         self.window = window
@@ -235,7 +235,7 @@ class SFEncoder(Encoder):
     """
    
     # Spiking Neural Networks: Background, Recent Development and the NeuCube Architecture. https://github.com/KEDRI-AUT/snn-encoder-tools
-    def __init__(self, num_steps, threshold=0.1, off_spike=False):
+    def __init__(self, num_steps, threshold=0.2, off_spike=False):
         super().__init__(num_steps)
         self.threshold = threshold
         self.off_spike = off_spike

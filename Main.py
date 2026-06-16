@@ -33,8 +33,8 @@ config_base = {
         'poisson' : {'rescale_fac': 2.0},
         'ttfs'    : {'normalize': True, 'linear': True},
         'delta'   : {'threshold': 0.1},
-        'MW'      : {'threshold': 0.1, 'window': 5},
-        'SF'      : {'threshold': 0.1},
+        'MW'      : {'threshold': 0.2, 'window': 5},
+        'SF'      : {'threshold': 0.2},
     },
     'decoder_params': {
         'rate'        : {'scale': 1.0},
